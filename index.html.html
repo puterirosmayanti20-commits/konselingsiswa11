@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Siswa Terpadu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-xl mx-auto p-4">
+        <!-- Halaman Login -->
+        <div id="login-page" class="page active bg-white p-8 rounded-xl shadow-lg">
+            <h2 id="login-title" class="text-3xl font-bold text-center text-gray-800 mb-2">Portal Siswa</h2>
+            <p class="text-center text-gray-500 mb-8">Login untuk Absensi & Konseling.</p>
+            <form id="login-form">
+                <div id="student-login-fields">
+                    <div class="mb-4">
+                        <label for="nama" class="block text-gray-700 text-sm font-medium mb-2">Nama Lengkap</label>
+                        <input type="text" id="nama" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Budi Santoso">
+                    </div>
+                    <div class="mb-6">
+                        <label for="kelas" class="block text-gray-700 text-sm font-medium mb-2">Kelas</label>
+                        <input type="text" id="kelas" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 10A">
+                    </div>
+                </div>
+                 <div id="admin-login-fields" class="hidden">
+                    <div class="mb-4">
+                        <label for="admin-user" class="block text-gray-700 text-sm font-medium mb-2">Username Admin</label>
+                        <input type="text" id="admin-user" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Username">
+                    </div>
+                    <div class="mb-6">
+                        <label for="admin-pass" class="block text-gray-700 text-sm font-medium mb-2">Password Admin</label>
+                        <input type="password" id="admin-pass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="********">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Login
+                </button>
+                <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
+            </form>
+            <div class="text-center mt-6">
+                <a href="#" id="toggle-login-mode" class="text-sm text-blue-600 hover:underline">Login sebagai Admin</a>
+            </div>
+        </div>
+
+        <!-- Dasbor Siswa -->
+        <div id="dashboard-page" class="page">
+             <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <p class="text-gray-600">Selamat datang,</p>
+                        <h2 id="dashboard-student-name" class="text-2xl font-bold text-gray-800"></h2>
+                        <p id="dashboard-student-class" class="text-md text-gray-500"></p>
+                    </div>
+                    <button class="logout-btn text-sm font-medium text-red-500 hover:text-red-700 flex items-center gap-1">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="goto-attendance-btn" class="bg-green-500 text-white p-6 rounded-lg text-left hover:bg-green-600 transition-transform hover:scale-105">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h3 class="font-bold text-lg">Absensi Harian</h3>
+                        <p class="text-sm">Catat kehadiran Anda hari ini.</p>
+                    </button>
+                    <button id="goto-counseling-btn" class="bg-purple-500 text-white p-6 rounded-lg text-left hover:bg-purple-600 transition-transform hover:scale-105">
+                        <i class="fas fa-comment-dots fa-2x mb-2"></i>
+                        <h3 class="font-bold text-lg">Konseling Siswa</h3>
+                        <p class="text-sm">Ajukan sesi atau lihat riwayat.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Halaman Absensi -->
+        <div id="attendance-page" class="page bg-white p-8 rounded-xl shadow-lg">
+             <button class="back-to-dashboard text-sm text-blue-600 mb-4"><i class="fas fa-arrow-left"></i> Kembali ke Dasbor</button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Absensi Harian</h2>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center mb-6">
+                <p id="current-date" class="font-semibold text-lg text-blue-600"></p>
+            </div>
+            <div id="attendance-buttons" class="grid grid-cols-2 gap-4 mb-6">
+                <button id="present-btn" class="bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600">Hadir</button>
+                <button id="absent-btn" class="bg-yellow-500 text-white font-semibold py-3 rounded-lg hover:bg-yellow-600">Izin / Sakit</button>
+            </div>
+            <div id="attendance-message" class="text-center p-3 rounded-lg mb-6"></div>
+            <hr class="my-6"><h3 class="text-lg font-bold text-gray-700 mb-4 text-center">Riwayat Absensi</h3>
+            <div id="attendance-history" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
+        </div>
+        
+        <!-- Halaman Konseling Siswa -->
+        <div id="counseling-page" class="page bg-white p-8 rounded-xl shadow-lg">
+             <button class="back-to-dashboard text-sm text-blue-600 mb-4"><i class="fas fa-arrow-left"></i> Kembali ke Dasbor</button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Konseling Siswa</h2>
+            <div class="bg-blue-50 p-6 rounded-lg mb-6">
+                <h3 class="font-bold text-gray-800 mb-2">Ajukan Jadwal Konseling Baru</h3>
+                <form id="counseling-form">
+                    <div class="mb-3">
+                        <label for="counseling-topic" class="block text-sm font-medium text-gray-700">Topik Konseling</label>
+                        <select id="counseling-topic" class="mt-1 w-full p-2 border border-gray-300 rounded-md">
+                            <option>Akademik</option><option>Pribadi</option><option>Karir</option><option>Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="counseling-details" class="block text-sm font-medium text-gray-700">Detail Singkat</label>
+                        <textarea id="counseling-details" rows="3" class="mt-1 w-full p-2 border border-gray-300 rounded-md" placeholder="Ceritakan masalahmu di sini..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700">Kirim Permintaan</button>
+                </form>
+                <p id="counseling-success" class="text-green-600 text-sm mt-3 text-center"></p>
+            </div>
+             <hr class="my-6"><h3 class="text-lg font-bold text-gray-700 mb-4 text-center">Riwayat Konseling</h3>
+            <div id="counseling-history" class="space-y-3 max-h-48 overflow-y-auto pr-2"></div>
+        </div>
+
+        <!-- Dasbor Admin -->
+        <div id="admin-dashboard-page" class="page bg-white p-8 rounded-xl shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Dasbor Admin</h2>
+                <button class="logout-btn text-sm font-medium text-red-500 hover:text-red-700 flex items-center gap-1">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Semua Permintaan Konseling</h3>
+            <div id="admin-counseling-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                <!-- Daftar permintaan akan dimuat di sini -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    // Self-executing anonymous function to encapsulate code
+    (() => {
+        // --- DATA ---
+        const students = [
+            { id: 'budisantoso-10a', name: "Budi Santoso", class: "10A" },
+            { id: 'citralestari-11b', name: "Citra Lestari", class: "11B" },
+            { id: 'adinugroho-12c', name: "Adi Nugroho", class: "12C" }
+        ];
+        const adminCredentials = { user: 'admin', pass: 'admin123' };
+
+        // --- STATE ---
+        let isLoginAdminMode = false;
+
+        // --- ELEMENT SELECTORS ---
+        const getEl = (id) => document.getElementById(id);
+        const queryEl = (selector) => document.querySelector(selector);
+        const queryAll = (selector) => document.querySelectorAll(selector);
+
+        const pages = queryAll('.page');
+        // Login Page
+        const loginPage = getEl('login-page');
+        const loginTitle = getEl('login-title');
+        const studentLoginFields = getEl('student-login-fields');
+        const adminLoginFields = getEl('admin-login-fields');
+        const loginForm = getEl('login-form');
+        const loginError = getEl('login-error');
+        const toggleLoginModeBtn = getEl('toggle-login-mode');
+        
+        // Student Dashboard & Pages
+        const dashboardPage = getEl('dashboard-page');
+        const dashboardStudentName = getEl('dashboard-student-name');
+        const dashboardStudentClass = getEl('dashboard-student-class');
+        const gotoAttendanceBtn = getEl('goto-attendance-btn');
+        const gotoCounselingBtn = getEl('goto-counseling-btn');
+        const attendancePage = getEl('attendance-page');
+        const currentDateEl = getEl('current-date');
+        const attendanceButtons = getEl('attendance-buttons');
+        const presentBtn = getEl('present-btn');
+        const absentBtn = getEl('absent-btn');
+        const attendanceMessage = getEl('attendance-message');
+        const attendanceHistory = getEl('attendance-history');
+        const counselingPage = getEl('counseling-page');
+        const counselingForm = getEl('counseling-form');
+        const counselingSuccess = getEl('counseling-success');
+        const counselingHistory = getEl('counseling-history');
+
+        // Admin Dashboard
+        const adminDashboardPage = getEl('admin-dashboard-page');
+        const adminCounselingList = getEl('admin-counseling-list');
+
+        // Common Buttons
+        const logoutBtns = queryAll('.logout-btn');
+        const backToDashboardBtns = queryAll('.back-to-dashboard');
+
+        // --- UTILITY FUNCTIONS ---
+        const showPage = (pageId) => {
+            pages.forEach(p => p.classList.remove('active'));
+            getEl(pageId).classList.add('active');
+        };
+        const getTodayDateString = () => new Date().toISOString().split('T')[0];
+        const formatIndonesianDate = (dateStr) => new Date(dateStr).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        const getStudentById = (id) => students.find(s => s.id === id);
+
+        // --- STORAGE FUNCTIONS ---
+        const getLocalStorage = (key, defaultValue = {}) => JSON.parse(localStorage.getItem(key)) || defaultValue;
+        const setLocalStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+        const getSessionStorage = (key) => JSON.parse(sessionStorage.getItem(key));
+        const setSessionStorage = (key, value) => sessionStorage.setItem(key, JSON.stringify(value));
+        const clearSessionStorage = () => sessionStorage.clear();
+
+        // --- LOGIN & NAVIGATION ---
+        const toggleLoginMode = () => {
+            isLoginAdminMode = !isLoginAdminMode;
+            studentLoginFields.classList.toggle('hidden');
+            adminLoginFields.classList.toggle('hidden');
+            loginForm.reset();
+            loginError.textContent = '';
+            if (isLoginAdminMode) {
+                loginTitle.textContent = "Login Admin";
+                toggleLoginModeBtn.textContent = "Login sebagai Siswa";
+            } else {
+                loginTitle.textContent = "Portal Siswa";
+                toggleLoginModeBtn.textContent = "Login sebagai Admin";
+            }
+        };
+
+        const handleLogin = (e) => {
+            e.preventDefault();
+            if (isLoginAdminMode) {
+                const user = getEl('admin-user').value;
+                const pass = getEl('admin-pass').value;
+                if (user === adminCredentials.user && pass === adminCredentials.pass) {
+                    setSessionStorage('loggedInUser', { id: 'admin', role: 'admin' });
+                    setupAdminDashboard();
+                    showPage('admin-dashboard-page');
+                } else {
+                    loginError.textContent = "Username atau Password Admin salah.";
+                }
+            } else {
+                const name = getEl('nama').value.trim();
+                const studentClass = getEl('kelas').value.trim();
+                const foundStudent = students.find(s => s.name.toLowerCase() === name.toLowerCase() && s.class.toLowerCase() === studentClass.toLowerCase());
+                if (foundStudent) {
+                    setSessionStorage('loggedInUser', { ...foundStudent, role: 'student' });
+                    setupStudentDashboard(foundStudent);
+                    showPage('dashboard-page');
+                } else {
+                    loginError.textContent = "Nama atau Kelas tidak ditemukan.";
+                }
+            }
+            loginForm.reset();
+        };
+
+        const handleLogout = () => {
+            clearSessionStorage();
+            showPage('login-page');
+        };
+
+        const setupStudentDashboard = (userData) => {
+            dashboardStudentName.textContent = userData.name;
+            dashboardStudentClass.textContent = `Kelas: ${userData.class}`;
+        };
+
+        // --- ADMIN DASHBOARD FUNCTIONS ---
+        const setupAdminDashboard = () => {
+            const counselingData = getLocalStorage('counselingData');
+            const allRequests = [];
+            for (const studentId in counselingData) {
+                const studentInfo = getStudentById(studentId);
+                if (studentInfo) {
+                    counselingData[studentId].forEach(request => {
+                        allRequests.push({ ...request, studentId, studentInfo });
+                    });
+                }
+            }
+
+            allRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            adminCounselingList.innerHTML = '';
+
+            if (allRequests.length === 0) {
+                adminCounselingList.innerHTML = '<p class="text-center text-gray-500">Belum ada permintaan konseling.</p>';
+                return;
+            }
+
+            allRequests.forEach(req => {
+                const statusOptions = ['Terkirim', 'Ditinjau', 'Selesai'];
+                const selectOptions = statusOptions.map(opt => `<option value="${opt}" ${req.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                const card = document.createElement('div');
+                card.className = "bg-gray-50 p-4 rounded-lg border";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-bold text-gray-800">${req.studentInfo.name}</p>
+                            <p class="text-sm text-gray-500">Kelas: ${req.studentInfo.class}</p>
+                        </div>
+                        <div class="text-right">
+                           <p class="font-semibold text-gray-700">${req.topic}</p>
+                           <p class="text-xs text-gray-400">${new Date(req.timestamp).toLocaleDateString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 bg-white p-2 rounded border mb-3">"${req.details}"</p>
+                    <div class="flex items-center gap-2">
+                        <label for="status-${req.id}" class="text-sm font-medium">Ubah Status:</label>
+                        <select id="status-${req.id}" data-student-id="${req.studentId}" data-request-id="${req.id}" class="status-select w-full p-1 border border-gray-300 rounded-md text-sm">
+                            ${selectOptions}
+                        </select>
+                    </div>
+                `;
+                adminCounselingList.appendChild(card);
+            });
+        };
+
+        const updateCounselingStatus = (studentId, requestId, newStatus) => {
+            let counselingData = getLocalStorage('counselingData');
+            const studentRequests = counselingData[studentId];
+            if (studentRequests) {
+                const requestIndex = studentRequests.findIndex(r => r.id === requestId);
+                if (requestIndex !== -1) {
+                    studentRequests[requestIndex].status = newStatus;
+                    setLocalStorage('counselingData', counselingData);
+                }
+            }
+        };
+
+        // --- STUDENT FUNCTIONS (ATTENDANCE & COUNSELING) ---
+        const setupAttendancePage = () => {
+            const session = getSessionStorage('loggedInUser');
+            if (!session) return;
+            currentDateEl.textContent = formatIndonesianDate(new Date());
+            loadAttendanceHistory(session.id);
+            checkTodayAttendance(session.id);
+        };
+        const markAttendance = (status) => {
+            const session = getSessionStorage('loggedInUser');
+            if (!session) return;
+            const studentId = session.id;
+            const today = getTodayDateString();
+            let data = getLocalStorage('attendanceData');
+            if (!data[studentId]) data[studentId] = {};
+            if (data[studentId][today]) return;
+            data[studentId][today] = { status, timestamp: new Date().toISOString() };
+            setLocalStorage('attendanceData', data);
+            loadAttendanceHistory(studentId);
+            checkTodayAttendance(studentId);
+        };
+        const loadAttendanceHistory = (studentId) => {
+            const userHistory = getLocalStorage('attendanceData')[studentId] || {};
+            attendanceHistory.innerHTML = '';
+            const sortedDates = Object.keys(userHistory).sort().reverse();
+            if (sortedDates.length === 0) {
+                attendanceHistory.innerHTML = '<p class="text-center text-gray-500">Belum ada riwayat.</p>'; return;
+            }
+            sortedDates.forEach(dateStr => {
+                const record = userHistory[dateStr];
+                const statusClass = record.status === 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                attendanceHistory.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg"><p class="font-medium text-gray-700">${formatIndonesianDate(dateStr+'T00:00:00')}</p><span class="text-sm font-semibold px-2 py-1 rounded-full ${statusClass}">${record.status}</span></div>`;
+            });
+        };
+        const checkTodayAttendance = (studentId) => {
+            const todayRecord = getLocalStorage('attendanceData')[studentId]?.[getTodayDateString()];
+            if (todayRecord) {
+                attendanceButtons.classList.add('hidden');
+                attendanceMessage.classList.remove('hidden');
+                attendanceMessage.textContent = `Anda sudah absen hari ini sebagai "${todayRecord.status}".`;
+                attendanceMessage.className = `text-center p-3 rounded-lg mb-6 ${todayRecord.status === 'Hadir' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`;
+            } else {
+                attendanceButtons.classList.remove('hidden');
+                attendanceMessage.classList.add('hidden');
+            }
+        };
+        const setupCounselingPage = () => {
+            const session = getSessionStorage('loggedInUser');
+            if (!session) return;
+            loadCounselingHistory(session.id);
+            counselingSuccess.textContent = '';
+        };
+        const handleCounselingSubmit = (e) => {
+            e.preventDefault();
+            const session = getSessionStorage('loggedInUser');
+            if (!session) return;
+            const details = getEl('counseling-details').value.trim();
+            if (!details) { alert("Detail tidak boleh kosong."); return; }
+            let data = getLocalStorage('counselingData');
+            if (!data[session.id]) data[session.id] = [];
+            const newRequest = { id: Date.now(), topic: getEl('counseling-topic').value, details, status: 'Terkirim', timestamp: new Date().toISOString() };
+            data[session.id].push(newRequest);
+            setLocalStorage('counselingData', data);
+            counselingForm.reset();
+            counselingSuccess.textContent = "Permintaan berhasil dikirim!";
+            setTimeout(() => counselingSuccess.textContent = '', 3000);
+            loadCounselingHistory(session.id);
+        };
+        const loadCounselingHistory = (studentId) => {
+            const userHistory = getLocalStorage('counselingData')[studentId] || [];
+            counselingHistory.innerHTML = '';
+            if (userHistory.length === 0) { counselingHistory.innerHTML = '<p class="text-center text-gray-500">Belum ada riwayat.</p>'; return; }
+            userHistory.sort((a,b) => b.id - a.id).forEach(req => {
+                const statusColors = { 'Terkirim': 'bg-blue-100 text-blue-800', 'Ditinjau': 'bg-yellow-100 text-yellow-800', 'Selesai': 'bg-green-100 text-green-800' };
+                counselingHistory.innerHTML += `<div class="bg-gray-50 p-4 rounded-lg"><div class="flex justify-between items-center mb-2"><p class="font-bold text-gray-800">${req.topic}</p><span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[req.status] || 'bg-gray-200'}">${req.status}</span></div><p class="text-sm text-gray-600 mb-2">"${req.details}"</p><p class="text-xs text-gray-400 text-right">Diajukan: ${new Date(req.timestamp).toLocaleDateString('id-ID')}</p></div>`;
+            });
+        };
+
+        // --- EVENT LISTENERS ---
+        toggleLoginModeBtn.addEventListener('click', toggleLoginMode);
+        loginForm.addEventListener('submit', handleLogin);
+        logoutBtns.forEach(btn => btn.addEventListener('click', handleLogout));
+        gotoAttendanceBtn.addEventListener('click', () => { setupAttendancePage(); showPage('attendance-page'); });
+        gotoCounselingBtn.addEventListener('click', () => { setupCounselingPage(); showPage('counseling-page'); });
+        backToDashboardBtns.forEach(btn => btn.addEventListener('click', () => showPage('dashboard-page')));
+        presentBtn.addEventListener('click', () => markAttendance('Hadir'));
+        absentBtn.addEventListener('click', () => markAttendance('Izin / Sakit'));
+        counselingForm.addEventListener('submit', handleCounselingSubmit);
+        adminDashboardPage.addEventListener('change', (e) => {
+            if (e.target.matches('.status-select')) {
+                const studentId = e.target.dataset.studentId;
+                const requestId = parseInt(e.target.dataset.requestId, 10);
+                const newStatus = e.target.value;
+                updateCounselingStatus(studentId, requestId, newStatus);
+            }
+        });
+
+        // --- INITIALIZATION ---
+        const checkInitialSession = () => {
+            const user = getSessionStorage('loggedInUser');
+            if (user) {
+                if (user.role === 'admin') {
+                    setupAdminDashboard();
+                    showPage('admin-dashboard-page');
+                } else {
+                    setupStudentDashboard(user);
+                    showPage('dashboard-page');
+                }
+            } else {
+                showPage('login-page');
+            }
+        };
+        
+        checkInitialSession();
+
+    })();
+    </script>
+</body>
+</html>
